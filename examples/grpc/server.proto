@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+import "google/protobuf/descriptor.proto";
+
+extend google.protobuf.MethodOptions {
+    MO mo = 50006;
+}
+
+message MO {
+    string method = 1;
+}
+
+message HelloRequest {
+    string say    = 1;
+}
+
+message HelloResponse {
+    string reply  = 1;
+}
+
+service SimpleService {
+
+    // this is http://c3po/service/SimpleService/call/Hello
+    rpc Hello(HelloRequest) returns (HelloResponse) {
+        option (mo).method = "GET";
+    };
+
+}
