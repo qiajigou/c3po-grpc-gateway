@@ -101,7 +101,7 @@ def get_service_identify_from_pb_file(stubs, pb2):
 def search_method_option_in_service(stubs, service, call):
     idt = get_service_identify(stubs, service)
     if not idt:
-        raise ProtoParseException('not registed service or call')
+        raise ProtoParseException('not registed service')
     options = dict()
 
     for k, v in idt.items():
@@ -109,7 +109,9 @@ def search_method_option_in_service(stubs, service, call):
             options = v
             break
 
-    return options
+    if options:
+        return options
+    raise ProtoParseException('no such a call')
 
 
 def from_pb_to_json(pb):
