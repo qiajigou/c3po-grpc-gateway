@@ -8,9 +8,9 @@ This is a light weight Python gRPC gateway. A simple transform layer. Translate 
 
 Sometimes we are using gRPC and protobuf, but for Web and other language which not support gRPC, we could use this simple transport layer.
 
-<div class="margin: 0px auto">
+<p align="center">
 <img src="images/overview.png" width="500px">
-</div>
+</p>
 
 # Example
 
