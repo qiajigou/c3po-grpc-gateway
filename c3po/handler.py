@@ -2,11 +2,11 @@ import tornado.web
 
 from tornado import gen
 
-from force.pb.json import pb2json
-from utils import dynamic_client_getter, search_method_option_in_service
+from utils import dynamic_client_getter, search_method_option_in_service, from_pb_to_json
 
 
 class HelloHandler(tornado.web.RequestHandler):
+
     def initialize(self, stubs, debug):
         self.stubs = stubs
         self.debug = debug
@@ -25,6 +25,7 @@ class HelloHandler(tornado.web.RequestHandler):
 
 
 class ServiceHandler(tornado.web.RequestHandler):
+
     def initialize(self, stubs, debug):
         self.stubs = stubs
         self.debug = debug
@@ -101,7 +102,7 @@ class ServiceHandler(tornado.web.RequestHandler):
 
         if response:
             try:
-                ret = pb2json(response)
+                ret = from_pb_to_json(response)
             except:
                 self.set_status(400)
                 ret = dict(error='cannot load from pb')
