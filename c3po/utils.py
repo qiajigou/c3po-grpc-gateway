@@ -1,47 +1,10 @@
+import json
 import sys
 import imp
 import importlib
 
+from google.protobuf import json_format
 from google.protobuf import descriptor_pb2
-from google.protobuf.descriptor import FieldDescriptor as fd
-
-_ftype2js = {
-    fd.TYPE_DOUBLE: float,
-    fd.TYPE_FLOAT: float,
-    fd.TYPE_INT64: long,
-    fd.TYPE_UINT64: long,
-    fd.TYPE_INT32: int,
-    fd.TYPE_FIXED64: float,
-    fd.TYPE_FIXED32: float,
-    fd.TYPE_BOOL: bool,
-    fd.TYPE_STRING: unicode,
-    fd.TYPE_BYTES: lambda x: x.encode('string_escape'),
-    fd.TYPE_UINT32: int,
-    fd.TYPE_ENUM: int,
-    fd.TYPE_SFIXED32: float,
-    fd.TYPE_SFIXED64: float,
-    fd.TYPE_SINT32: int,
-    fd.TYPE_SINT64: long,
-}
-
-_js2ftype = {
-    fd.TYPE_DOUBLE: float,
-    fd.TYPE_FLOAT: float,
-    fd.TYPE_INT64: long,
-    fd.TYPE_UINT64: long,
-    fd.TYPE_INT32: int,
-    fd.TYPE_FIXED64: float,
-    fd.TYPE_FIXED32: float,
-    fd.TYPE_BOOL: bool,
-    fd.TYPE_STRING: unicode,
-    fd.TYPE_BYTES: lambda x: x.decode('string_escape'),
-    fd.TYPE_UINT32: int,
-    fd.TYPE_ENUM: int,
-    fd.TYPE_SFIXED32: float,
-    fd.TYPE_SFIXED64: float,
-    fd.TYPE_SINT32: int,
-    fd.TYPE_SINT64: long,
-}
 
 
 class ProtoParseException(Exception):
@@ -114,21 +77,11 @@ def search_method_option_in_service(stubs, service, call):
     raise ProtoParseException('no such a call')
 
 
-def from_pb_to_json(pb):
-    js = {}
-    fields = pb.ListFields()
-    for field, value in fields:
-        if field.type == fd.TYPE_MESSAGE:
-            ftype = from_pb_to_json
-        elif field.type in _ftype2js:
-            ftype = _ftype2js[field.type]
-        else:
-            raise ParseException
-        if field.label == fd.LABEL_REPEATED:
-            js_value = []
-            for v in value:
-                js_value.append(ftype(v))
-        else:
-            js_value = ftype(value)
-        js[field.name] = js_value
-    return js
+def pb2json(pb):
+    return json.loads(json_format.MessageToJson(pb))
+
+
+def json2pb(pb, js):
+    if isinstance(js, dict):
+        js = json.dumps(js)
+    return json_format.Parse(js, pb)
