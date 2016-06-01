@@ -28,8 +28,9 @@ class HelloHandler(tornado.web.RequestHandler):
 
 class ServiceHandler(tornado.web.RequestHandler):
 
-    def initialize(self, stubs, debug):
-        self.stubs = stubs
+    def initialize(self, server, debug):
+        self.server = server
+        self.stubs = server.stubs
         self.debug = debug
 
     @gen.coroutine
