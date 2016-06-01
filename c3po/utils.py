@@ -68,7 +68,7 @@ def search_method_option_in_service(stubs, service, call):
     options = dict()
 
     for k, v in idt.items():
-        if str(k).lower() == call:
+        if str(k) == call:
             options = v
             break
 
