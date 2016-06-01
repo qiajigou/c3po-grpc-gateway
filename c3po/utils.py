@@ -78,7 +78,7 @@ def search_method_option_in_service(stubs, service, call):
 
 
 def pb2json(pb):
-    return json.loads(json_format.MessageToJson(pb))
+    return json.loads(json_format.MessageToJson(pb, including_default_value_fields=True))
 
 
 def json2pb(pb, js):
