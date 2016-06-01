@@ -101,6 +101,8 @@ class ServiceHandler(tornado.web.RequestHandler):
 
         if response:
             try:
+                status_code = self.server.status_handler(response)
+                self.set_status(status_code)
                 ret = pb2json(response)
             except:
                 self.set_status(400)

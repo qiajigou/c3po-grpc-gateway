@@ -48,6 +48,9 @@ class Server(object):
     def request_handler(self, request):
         pass
 
+    def status_handler(self, response):
+        return 200
+
     def run(self, debug=False):
         app = tornado.web.Application([
             ('/service/([^/]+)/call/([^/]+)',

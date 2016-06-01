@@ -26,7 +26,11 @@ def handle_header(request):
     metadata = ()
     return metadata
 
+def status_handler(response):
+    return 200
+
 app.request_handler = handle_header
+app.status_handler= status_handler
 
 try:
     print('running server on 0.0.0.0:8888')
