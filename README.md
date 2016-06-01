@@ -2,6 +2,8 @@
 
 A light weight Python gRPC transport layer gateway with tornado named c3po.
 
+[![Build Status](https://travis-ci.org/qiajigou/c3po-grpc-gateway.svg?branch=master)](https://travis-ci.org/qiajigou/c3po-grpc-gateway)
+
 # Overview
 
 This is a light weight Python gRPC gateway. A simple transform layer. Translate gRPC protobuf objects to JSON objects.

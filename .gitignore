@@ -12,3 +12,4 @@ tests/.cache/*
 .cache
 venv
 .DS_Store
+.tox/*
