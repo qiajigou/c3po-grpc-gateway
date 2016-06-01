@@ -2,7 +2,7 @@ import tornado.web
 
 from tornado import gen
 
-from utils import dynamic_client_getter, search_method_option_in_service, from_pb_to_json
+from utils import dynamic_client_getter, search_method_option_in_service, pb2json
 
 
 class HelloHandler(tornado.web.RequestHandler):
@@ -53,7 +53,7 @@ class ServiceHandler(tornado.web.RequestHandler):
             ret = dict(error='method not allowed')
             if self.debug:
                 ret['exception'] = str(e)
-            self.write(e)
+            self.write(ret)
             return
 
         return self.parse_service_call(service, call)
@@ -72,7 +72,6 @@ class ServiceHandler(tornado.web.RequestHandler):
     def parse_service_call(self, service, call):
         client = dynamic_client_getter(self.stubs, service)
         args = dict()
-
         for k, v in self.request.arguments.items():
             if isinstance(v, list):
                 v = v[0]
@@ -102,7 +101,7 @@ class ServiceHandler(tornado.web.RequestHandler):
 
         if response:
             try:
-                ret = from_pb_to_json(response)
+                ret = pb2json(response)
             except:
                 self.set_status(400)
                 ret = dict(error='cannot load from pb')
