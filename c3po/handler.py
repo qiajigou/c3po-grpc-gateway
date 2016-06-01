@@ -28,8 +28,9 @@ class HelloHandler(tornado.web.RequestHandler):
 
 class ServiceHandler(tornado.web.RequestHandler):
 
-    def initialize(self, stubs, debug):
-        self.stubs = stubs
+    def initialize(self, server, debug):
+        self.server = server
+        self.stubs = server.stubs
         self.debug = debug
 
     @gen.coroutine
@@ -100,6 +101,8 @@ class ServiceHandler(tornado.web.RequestHandler):
 
         if response:
             try:
+                status_code = self.server.status_handler(response)
+                self.set_status(status_code)
                 ret = pb2json(response)
             except:
                 self.set_status(400)
