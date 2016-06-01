@@ -39,15 +39,23 @@ class Server(object):
         self.port = port
         self.debug = debug
 
+    def __repr__(self):
+        return 'C3PO Server'
+
     def register(self, stub):
         self.stubs[stub.name] = stub
+
+    def request_handler(self, request):
+        pass
 
     def run(self, debug=False):
         app = tornado.web.Application([
             ('/service/([^/]+)/call/([^/]+)',
-             ServiceHandler, dict(stubs=self.stubs, debug=debug)),
+             ServiceHandler, dict(debug=debug,
+                                  server=self)),
             ('/',
-             HelloHandler, dict(stubs=self.stubs, debug=debug))
+             HelloHandler, dict(debug=debug,
+                                server=self))
         ], debug=debug)
 
         app.listen(self.port)

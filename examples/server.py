@@ -22,6 +22,12 @@ stub.server_pb2_module_path = (CURRENT_DIR + '/grpc/server_pb2.py')
 
 app.register(stub)
 
+def handle_header(request):
+    metadata = ()
+    return metadata
+
+app.request_handler = handle_header
+
 try:
     print('running server on 0.0.0.0:8888')
     app.run(debug=True)

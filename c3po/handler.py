@@ -7,8 +7,9 @@ from utils import dynamic_client_getter, search_method_option_in_service, pb2jso
 
 class HelloHandler(tornado.web.RequestHandler):
 
-    def initialize(self, stubs, debug):
-        self.stubs = stubs
+    def initialize(self, server, debug):
+        self.server = server
+        self.stubs = server.stubs
         self.debug = debug
 
     def get(self):
@@ -20,6 +21,7 @@ class HelloHandler(tornado.web.RequestHandler):
             html += '<h1>%s</h1>' % name
             for k, v in stub.__dict__.items():
                 html += '%s=%s' % (k, v) + '<br>'
+            html += 'server=%s' % (str(self.server))
             html += '<hr>'
         self.write(html)
 
@@ -77,12 +79,9 @@ class ServiceHandler(tornado.web.RequestHandler):
                 v = v[0]
             args[k] = v
         with_call = args.get('with_call') == 1
-        metadata = self.request.headers.get('X-Metadata', None)
-        if metadata:
-            # TODO
-            # need to think the struct of this header
-            # encoded json or simple string split?
-            args['metadata'] = metadata
+
+        if self.server.request_handler:
+            args['metadata'] = self.server.request_handler(self.request)
 
         ret = dict()
         response = None
