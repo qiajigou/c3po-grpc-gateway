@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>c3po-grpc-gateway by qiajigou</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">c3po-grpc-gateway</h1>
+      <h2 class="project-tagline">A light weight Python grpc gateway with tornado named c3po.</h2>
+      <a href="https://github.com/qiajigou/c3po-grpc-gateway" class="btn">View on GitHub</a>
+      <a href="https://github.com/qiajigou/c3po-grpc-gateway/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/qiajigou/c3po-grpc-gateway/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <h1>
+<a id="c3po" class="anchor" href="#c3po" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>C3PO</h1>
+
+<p>A light weight Python gRPC transport layer gateway with tornado named c3po.</p>
+
+<h1>
+<a id="overview" class="anchor" href="#overview" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Overview</h1>
+
+<p>This is a light weight Python gRPC gateway. A simple transform layer. Translate gRPC protobuf objects to JSON objects.</p>
+
+<p>Sometimes we are using gRPC and protobuf, but for Web and other language which not support gRPC, we could use this simple transport layer.</p>
+
+<p align="center">
+<img src="https://raw.githubusercontent.com/qiajigou/c3po-grpc-gateway/master/images/c3po.png" width="500px">
+</p>
+
+<h1>
+<a id="example" class="anchor" href="#example" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Example</h1>
+
+<p>Just look into the examples folder.</p>
+
+<h2>
+<a id="protobuf" class="anchor" href="#protobuf" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Protobuf</h2>
+
+<p>Use method option.</p>
+
+<div class="highlight highlight-source-diff"><pre>syntax = "proto3";
+
+<span class="pl-mi1">+ import "google/protobuf/descriptor.proto";</span>
+<span class="pl-mi1">+</span>
+<span class="pl-mi1">+ extend google.protobuf.MethodOptions {</span>
+<span class="pl-mi1">+     MO mo = 50006;</span>
+<span class="pl-mi1">+ }</span>
+<span class="pl-mi1">+</span>
+<span class="pl-mi1">+ message MO {</span>
+<span class="pl-mi1">+     string method = 1;</span>
+<span class="pl-mi1">+ }</span>
+
+message HelloRequest {
+    string say    = 1;
+}
+
+message HelloResponse {
+    string reply  = 1;
+}
+
+service SimpleService {
+    rpc Hello(HelloRequest) returns (HelloResponse){
+<span class="pl-mi1">+       option (mo).method = "GET";</span>
+    }
+}</pre></div>
+
+<h2>
+<a id="python" class="anchor" href="#python" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Python</h2>
+
+<p>Right now we could run <code>gen_code.sh</code>. We get <code>server_pb2.py</code>. But C3PO could not transform gRPC/Protobuf Project to HTTP/JSON. We have to create a gRPC client to connect with server.</p>
+
+<p>The best way is load client codes dynamic.</p>
+
+<p>If we have a gRPC service called A, we need to have A server and A client.</p>
+
+<p>C3PO load A client dynamic and call client function by using A client.</p>
+
+<h2>
+<a id="c3po-server" class="anchor" href="#c3po-server" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>C3PO server</h2>
+
+<div class="highlight highlight-source-python"><pre><span class="pl-k">from</span> c3po.server <span class="pl-k">import</span> Server, Stub
+
+app <span class="pl-k">=</span> Server()
+
+stub <span class="pl-k">=</span> Stub()
+stub.name <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>hello<span class="pl-pds">'</span></span>
+<span class="pl-c"># load client py from path</span>
+stub.client_import_type <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>path<span class="pl-pds">'</span></span>
+stub.client_module_path <span class="pl-k">=</span> (<span class="pl-c1">CURRENT_DIR</span> <span class="pl-k">+</span> <span class="pl-s"><span class="pl-pds">'</span>/grpc/client.py<span class="pl-pds">'</span></span>)
+stub.client_module_name <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>client<span class="pl-pds">'</span></span>
+<span class="pl-c"># this means client.get_client()</span>
+stub.get_client_func <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>get_client<span class="pl-pds">'</span></span>
+
+stub.server_pb2_import_type <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>path<span class="pl-pds">'</span></span>
+<span class="pl-c"># Python get method option is hard</span>
+<span class="pl-c"># right now read option from server_pb2</span>
+stub.server_pb2_module_name <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>server_pb2<span class="pl-pds">'</span></span>
+stub.server_pb2_module_path <span class="pl-k">=</span> (<span class="pl-c1">CURRENT_DIR</span> <span class="pl-k">+</span> <span class="pl-s"><span class="pl-pds">'</span>/grpc/server_pb2.py<span class="pl-pds">'</span></span>)
+
+<span class="pl-c"># we could regist multi stub</span>
+app.register(stub)
+
+<span class="pl-k">try</span>:
+    <span class="pl-c1">print</span>(<span class="pl-s"><span class="pl-pds">'</span>running server on 0.0.0.0:8888<span class="pl-pds">'</span></span>)
+    app.run(<span class="pl-v">debug</span><span class="pl-k">=</span><span class="pl-c1">True</span>)
+<span class="pl-k">except</span> <span class="pl-c1">KeyboardInterrupt</span>:
+    <span class="pl-k">pass</span></pre></div>
+
+<ol>
+<li>
+<code>grpc</code> folder has grpc server and grpc client</li>
+<li>
+<code>examples</code> folder has c3po server</li>
+</ol>
+
+<h1>
+<a id="dynamic-module-loader" class="anchor" href="#dynamic-module-loader" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Dynamic module loader</h1>
+
+<p>We have two way to load the client</p>
+
+<ol>
+<li>import client from module</li>
+<li>import client from path</li>
+</ol>
+
+<h1>
+<a id="todo" class="anchor" href="#todo" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>TODO</h1>
+
+<p>This is in develop.</p>
+
+<p>Contact me at <a href="mailto:x@guojing.me">x@guojing.me</a></p>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/qiajigou/c3po-grpc-gateway">c3po-grpc-gateway</a> is maintained by <a href="https://github.com/qiajigou">qiajigou</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>
