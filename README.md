@@ -2,7 +2,7 @@
 
 A light weight Python gRPC transport layer gateway with tornado named c3po.
 
-[![Build Status](https://travis-ci.org/qiajigou/c3po-grpc-gateway.svg?branch=master)](https://travis-ci.org/qiajigou/c3po-grpc-gateway)
+[![Build Status](https://travis-ci.org/qiajigou/c3po-grpc-gateway.svg?branch=master)](https://travis-ci.org/qiajigou/c3po-grpc-gateway) [![Gitter](https://badges.gitter.im/qiajigou/c3po-grpc-gateway.svg)](https://gitter.im/qiajigou/c3po-grpc-gateway?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 # Overview
 
